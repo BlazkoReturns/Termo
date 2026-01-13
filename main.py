@@ -11,8 +11,10 @@ else:
     print("Erro na requisição")
     palavra = " "
 
-palavra_encripitada = ["_"] * len(palavra)
-letras_usadas = []
+palavra = "teste"
+palavra_encripitada = ["_"] * 5
+status_letras = [" "] * 5
+letras_inexistentes = []
 vidas = 5
 
 while True:
@@ -24,33 +26,29 @@ while True:
 
     for i in range(len(palavra_encripitada)):
         print(palavra_encripitada[i],end=" ")
-
-    if "_" not in palavra_encripitada:
-         print("\nVocê acertou a palavra.")
-         input("Pressione uma tecla para sair..")
-         break
-
-    tentativa = input("\n\nInforme uma letra:").lower()
     
-    if tentativa in letras_usadas:
-        continue
-
-    if tentativa not in string.ascii_lowercase:
-        continue  
-
-    letras_usadas.append(tentativa)
-    encontrou_letra = False
-
-    for i in range(len(palavra)):
-        letra = unicodedata.normalize('NFD', palavra[i]).encode('ascii', 'ignore').decode('utf-8')
-        if letra == tentativa:
-            palavra_encripitada[i] = palavra[i]
-            encontrou_letra = True
+    print()
     
-    if not encontrou_letra:
-        vidas -= 1
-        
-    if vidas == 0:
-         print(f"\nVocê perdeu.A palavra era {palavra}")
-         input("Pressione uma tecla para sair..")
-         break
+    for i in range(len(palavra_encripitada)):
+        print(status_letras[i],end=" ")
+
+    print()
+    print("Letra que não estão na palavra:",end=" ")
+     
+    for letra in letras_inexistentes:
+        print(letra,end=" ") 
+
+    tentativa = input("\n\nInforme uma palavra:").lower()
+    
+    for i,letra in enumerate(tentativa):
+        print(i)
+        palavra_encripitada[i] = letra
+
+        if letra == palavra[i]:
+            status_letras[i] = "*"
+        elif letra in palavra:
+            status_letras[i] = "!"
+        else:
+            status_letras[i] = "x"
+            if letra not in letras_inexistentes:
+                letras_inexistentes.append(letra)
