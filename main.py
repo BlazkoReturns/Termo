@@ -1,17 +1,15 @@
 import string
 import os
-import requests
+import time
 import unicodedata
+import random
 
-response = requests.get("https://api.dicionario-aberto.net/random")
-if response.status_code == 200:
-    dados = response.json()
-    palavra = dados.get("word")
-else:
-    print("Erro na requisição")
-    palavra = " "
+BANCO_DE_PALAVRAS = [
+    "termo", "sagaz", "amigo", "nobre", "algoz", "fazer", "ideia", 
+    "moral", "poder", "honra", "justo", "muito", "anexo", "etnia"
+]
 
-palavra = "teste"
+palavra = random.choice(BANCO_DE_PALAVRAS)
 palavra_encripitada = ["_"] * 5
 status_letras = [" "] * 5
 letras_inexistentes = []
@@ -19,32 +17,34 @@ vidas = 5
 
 while True:
     
-    if os.name == 'nt':
-        os.system('cls')
-    else:
-        os.system('clear')
-
-    for i in range(len(palavra_encripitada)):
-        print(palavra_encripitada[i],end=" ")
+    os.system('cls' if os.name == 'nt' else 'clear')
     
-    print()
+    if not vidas:
+        print(f"Não conseguiu desvendar a palavra. A palavra era {palavra}.")
+        break
     
-    for i in range(len(palavra_encripitada)):
-        print(status_letras[i],end=" ")
+    print("* -> letra na posição correta  ! -> letra na posição incorreta  x -> letra não existe na palavra")
+    print("Letras que não estão na palavra:",end=" ") 
+    print(*letras_inexistentes,end=" ") 
+    print(f"\nTentativas restantes: {vidas}\n")
+    print(*palavra_encripitada,sep=" ")
+    print(*status_letras,sep=" ")
 
-    print()
-    print("Letra que não estão na palavra:",end=" ")
-     
-    for letra in letras_inexistentes:
-        print(letra,end=" ") 
-
-    tentativa = input("\n\nInforme uma palavra:").lower()
+    tentativa = input("\nInforme uma palavra:").lower()
     
+    if len(tentativa)  != 5:
+        print("Tentativa deve ter exatamente 5 letras.", end="", flush=True)
+        for _ in range(3):
+           time.sleep(1)
+           print(".", end="", flush=True)
+        continue
+
     for i,letra in enumerate(tentativa):
-        print(i)
+        
         palavra_encripitada[i] = letra
-
-        if letra == palavra[i]:
+        
+        
+        if letra == unicodedata.normalize('NFD', palavra[i]).encode('ascii', 'ignore').decode('utf-8'):
             status_letras[i] = "*"
         elif letra in palavra:
             status_letras[i] = "!"
@@ -52,3 +52,9 @@ while True:
             status_letras[i] = "x"
             if letra not in letras_inexistentes:
                 letras_inexistentes.append(letra)
+    
+    if "x" in status_letras or "!" in status_letras:
+        vidas -= 1
+    else:
+       print("Parabéns, você desvendou a palavra.")
+       break
